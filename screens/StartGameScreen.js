@@ -7,6 +7,10 @@ import {
   TouchableWithoutFeedback,
   View,
   Alert,
+  Dimensions,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Card from "../components/Card";
 import Colors from "../constants/colors";
@@ -14,7 +18,7 @@ import NumberContainer from "../components/NumberContainer";
 import Input from "../components/Input";
 import BodyText from "../components/BodyText";
 import TitleText from "../components/TitleText";
-import MainButton from "../components/MainButton";
+import MainButton from "../components/MainButton.android";
 
 const StartGameScreen = (props) => {
   const [enteredValue, setEnteredValue] = useState("");
@@ -66,51 +70,59 @@ const StartGameScreen = (props) => {
     );
   }
 
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
-    >
-      <View style={styles.screen}>
-        {/* <TileText style={styles.title}>Start a new game!</TileText> */}
-        <TitleText>Start a new game!</TitleText>
-        <Card style={styles.inputContainer}>
-          {/* <Text style={styles.text}>Select a number:</Text> */}
-          <BodyText>Select a number</BodyText>
-          <Input
-            styles={styles.input}
-            blurOnSubmit
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="number-pad"
-            maxLength={2}
-            onChangeText={numberInputHandler}
-            value={enteredValue}
-          />
-          <View style={styles.buttonContainer}>
-            <View>
-              <Button
-                style={styles.button}
-                title="Reset"
-                onPress={resetInputHandler}
-                color={Colors.accent}
-              />
-            </View>
-            <View>
-              <Button
-                style={styles.button}
-                title="Confirm"
-                onPress={confirmInputHandler}
-                color={Colors.primary}
-              />
-            </View>
-          </View>
-        </Card>
+  // if (Platform.OS === "android" && Platform.Version >= 21) {
+  //    return <Text>{Platform.Version}</Text>;
+  // }
 
-        {confirmedOutput}
-      </View>
-    </TouchableWithoutFeedback>
+  return (
+    <ScrollView>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={30}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View style={styles.screen}>
+            {/* <TileText style={styles.title}>Start a new game!</TileText> */}
+            <TitleText>Start a new game!</TitleText>
+            <Card style={styles.inputContainer}>
+              {/* <Text style={styles.text}>Select a number:</Text> */}
+              <BodyText>Select a number</BodyText>
+              <Input
+                styles={styles.input}
+                blurOnSubmit
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="number-pad"
+                maxLength={2}
+                onChangeText={numberInputHandler}
+                value={enteredValue}
+              />
+              <View style={styles.buttonContainer}>
+                <View>
+                  <Button
+                    style={styles.button}
+                    title="Reset"
+                    onPress={resetInputHandler}
+                    color={Colors.accent}
+                  />
+                </View>
+                <View>
+                  <Button
+                    style={styles.button}
+                    title="Confirm"
+                    onPress={confirmInputHandler}
+                    color={Colors.primary}
+                  />
+                </View>
+              </View>
+            </Card>
+
+            {confirmedOutput}
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
@@ -135,7 +147,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   button: {
-    width: 100,
+    // width: 100,
+    width: Dimensions.get("window").width / 2,
   },
   input: {
     width: 50,

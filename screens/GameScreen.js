@@ -6,6 +6,8 @@ import {
   Button,
   Alert,
   ScrollView,
+  FlatList,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import NumberContainer from "../components/NumberContainer";
@@ -27,11 +29,12 @@ const generateRandomNumber = (min, max, exclude) => {
   }
 };
 
-const renderListItem = (value, numberOfRound) => {
+const renderListItem = (listLength, itemData) => {
+  console.log(itemData);
   return (
-    <View key={value} style={styles.listItem}>
-      <BodyText>#{numberOfRound}</BodyText>
-      <BodyText>{value}</BodyText>
+    <View style={styles.listItem}>
+      <BodyText>#{listLength - itemData.index}</BodyText>
+      <BodyText>{itemData.item}</BodyText>
     </View>
   );
 };
@@ -39,7 +42,7 @@ const renderListItem = (value, numberOfRound) => {
 const GameScreen = (props) => {
   const initialGuess = generateRandomNumber(1, 100, props.userChoice);
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
-  const [pastGuesses, setPastGuesses] = useState([initialGuess]);
+  const [pastGuesses, setPastGuesses] = useState([initialGuess.toString()]);
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
 
@@ -75,7 +78,10 @@ const GameScreen = (props) => {
     );
     setCurrentGuess(nextNumber);
     // setRounds((curRounds) => curRounds + 1);
-    setPastGuesses((curPastGuesses) => [nextNumber, ...curPastGuesses]);
+    setPastGuesses((curPastGuesses) => [
+      nextNumber.toString(),
+      ...curPastGuesses,
+    ]);
   };
 
   return (
@@ -90,12 +96,19 @@ const GameScreen = (props) => {
           <Ionicons name="md-add" size={24} color="white" />
         </MainButton>
       </Card>
-      <View style={styles.list}>
-        <ScrollView>
+      <View style={styles.listContainer}>
+        {/* <ScrollView contentContainerStyle={styles.list}>
           {pastGuesses.map((guess, index) =>
             renderListItem(guess, pastGuesses.length - index)
           )}
-        </ScrollView>
+        </ScrollView> */}
+
+        <FlatList
+          keyExtractor={(item) => item}
+          data={pastGuesses}
+          renderItem={renderListItem.bind(this, pastGuesses.length)}
+          contentContainerStyle={styles.list}
+        />
       </View>
     </View>
   );
@@ -113,10 +126,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 300,
     maxWidth: "80%",
+    marginTop: Dimensions.get("window").height > 600 ? 30 : 10,
+  },
+  listContainer: {
+    width: "60%",
+    flex: 1,
   },
   list: {
-    width: "80%",
-    flex: 1,
+    flexGrow: 1,
+    justifyContent: "flex-end",
   },
   listItem: {
     borderColor: Colors.primary,
@@ -126,6 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-around",
+    width: "100%",
   },
 });
 
